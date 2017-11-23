@@ -1,0 +1,36 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+
+<serilog>
+
+    <using>
+        <add name="Serilog.Enrichers.Thread" />
+        <add name="Serilog.Enrichers.Process" />
+        <add name="Serilog.Enrichers.Environment" />
+    </using>
+
+    <enrich>
+        <enricher name="FromLogContext" />
+        <enricher name="WithMachineName" />
+        <enricher name="WithThreadId" />
+        <enricher name="WithProcessId" />
+        <enricher name="WithEnvironmentUserName" />
+    </enrich>
+
+    <properties>
+        <property name="Application" value="Sample" />
+        <property name="Path" value="%PATH%" />
+    </properties>
+
+    <minimumLevel default="Information">
+        <override name="Microsoft" level="Warning" />
+        <override name="Microsoft.AspNetCore.Mvc" level="Error" />
+    </minimumLevel>
+
+    <writeTo>
+        <sink name="LiterateConsole" />
+        <sink name="File">
+            <arg name="path" value="%TEMP%\\Logs\\serilog-configuration-sample.txt" />
+        </sink>
+    </writeTo>
+
+</serilog>
