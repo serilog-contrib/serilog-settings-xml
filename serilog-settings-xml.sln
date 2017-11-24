@@ -10,6 +10,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "assets", "assets", "{E9D1B5
 		Build.ps1 = Build.ps1
 		README.md = README.md
 		assets\Serilog.snk = assets\Serilog.snk
+		appveyor.yml = appveyor.yml
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{7B927378-9F16-4F6F-B3F6-156395136646}"
