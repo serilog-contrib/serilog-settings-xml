@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using Serilog.Configuration;
@@ -48,6 +49,7 @@ namespace Serilog.Settings.Xml
                 ProcessUsings(document, settings);
                 ProcessEnrichers(document, settings);
                 ProcessProperties(document, settings);
+                ProcessWriteTo(document, settings);
 
                 loggerConfiguration.ReadFrom.KeyValuePairs(settings);
             }
@@ -101,6 +103,37 @@ namespace Serilog.Settings.Xml
                     value = Environment.ExpandEnvironmentVariables(value);
 
                 settings.Add(new KeyValuePair<string, string>($"{EnrichWithPropertyDirectivePrefix}{name}", value));
+            }
+        }
+        
+        private static void ProcessWriteTo(XDocument document, List<KeyValuePair<string, string>> settings)
+        {
+            var items = document.XPathSelectElements("/serilog/writeTo/sink");
+            foreach (var element in items)
+            {
+                if (!element.HasAttributes)
+                    continue;
+
+                var name = element.Attribute("name")?.Value;
+                if (string.IsNullOrEmpty(name))
+                    continue;
+
+                var parameters = element.XPathSelectElements("arg");
+
+                var baseKey = $"write-to:{name}";
+                if (!parameters.Any())
+                    settings.Add(new KeyValuePair<string, string>(baseKey, string.Empty));
+                
+                foreach (var parameter in parameters)
+                {
+                    var paramName = parameter.Attribute("name")?.Value;
+                    if (string.IsNullOrEmpty(paramName))
+                        continue;
+                    var paramValue = parameter.Attribute("value")?.Value;
+                    paramValue = Environment.ExpandEnvironmentVariables(paramValue);
+                    
+                    settings.Add(new KeyValuePair<string, string>($"{baseKey}.{paramName}", paramValue));
+                }
             }
         }
     }

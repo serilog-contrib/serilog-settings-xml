@@ -6,6 +6,8 @@
         <add name="Serilog.Enrichers.Thread" />
         <add name="Serilog.Enrichers.Process" />
         <add name="Serilog.Enrichers.Environment" />
+        <add name="Serilog.Sinks.RollingFile" />
+        <add name="Serilog.Sinks.File" />
     </using>
 
     <enrich>
@@ -28,8 +30,11 @@
 
     <writeTo>
         <sink name="LiterateConsole" />
+        <sink name="RollingFile">
+            <arg name="pathFormat" value="%TEMP%\Logs\serilog-configuration-{Date}.txt" />
+        </sink>
         <sink name="File">
-            <arg name="path" value="%TEMP%\\Logs\\serilog-configuration-sample.txt" />
+            <arg name="path" value="serilog-configuration.txt" />
         </sink>
     </writeTo>
 

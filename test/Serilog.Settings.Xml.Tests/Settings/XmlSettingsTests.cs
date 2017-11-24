@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
 using Serilog.Context;
 using Serilog.Events;
@@ -9,6 +10,11 @@ namespace Serilog.Settings.Xml.Tests.Settings
 {
     public sealed class XmlSettingsTests
     {
+        public XmlSettingsTests()
+        {
+            Debugging.SelfLog.Enable(msg => Debug.WriteLine(msg));
+        }
+        
         [Fact]
         public void EnvironmentVariableExpansionIsApplied()
         {
