@@ -1,10 +1,17 @@
-# Serilog.Settings.Xml
+# Serilog.Settings.Xml [![Build status](https://ci.appveyor.com/api/projects/status/y8yctf5c6v22clqh?svg=true)](https://ci.appveyor.com/project/rsabirov/serilog-settings-xml) [![NuGet](https://img.shields.io/nuget/dt/Serilog.Settings.Xml.svg)](https://www.nuget.org/packages/Serilog.Settings.Xml/)
 
-[![Build status](https://ci.appveyor.com/api/projects/status/y8yctf5c6v22clqh?svg=true)](https://ci.appveyor.com/project/rsabirov/serilog-settings-xml) 
-[![NuGet Version](http://img.shields.io/nuget/v/Serilog.Settings.Xml.svg?style=flat)](https://www.nuget.org/packages/Serilog.Settings.Xml/)
 An XML config reader for [Serilog](https://serilog.net).
 
-# Project is in active development stage
+### Project is in active development stage
+
+Roadmap:
+- [x] using
+- [x] properties
+- [x] enrich
+- [x] writeTo
+- [ ] minimumLevel 
+- [ ] auditTo
+
 
 ### Getting started
 
@@ -59,8 +66,9 @@ You can mix and match XML and code-based configuration, but each sink must be co
     <writeTo>
         <sink name="LiterateConsole" />
         <sink name="File">
-            <arg name="path" value="%TEMP%\\Logs\\serilog-configuration-sample.txt" />
+            <arg name="path" value="%TEMP%/Logs/serilog-configuration-sample.txt" />
         </sink>
     </writeTo>
 
-</serilog>```
+</serilog>
+```
