@@ -23,9 +23,8 @@
         <property name="Path" value="%PATH%" />
     </properties>
 
-    <minimumLevel default="Information">
-        <override name="Microsoft" level="Warning" />
-        <override name="Microsoft.AspNetCore.Mvc" level="Error" />
+    <minimumLevel default="Debug">
+        <override name="Serilog.Settings.Xml" level="Warning" />
     </minimumLevel>
 
     <writeTo>

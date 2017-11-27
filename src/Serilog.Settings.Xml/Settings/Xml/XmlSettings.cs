@@ -17,7 +17,6 @@ namespace Serilog.Settings.Xml
         private const string MinimumLevelDirective = "minimum-level";
         private const string EnrichWithDirective = "enrich";
         private const string EnrichWithPropertyDirective = "enrich:with-property";
-        private const string UsingDirectiveFullFormPrefix = "using:";
         private const string EnrichWithEventEnricherPrefix = "enrich:";
         private const string EnrichWithPropertyDirectivePrefix = "enrich:with-property:";
 
@@ -50,6 +49,7 @@ namespace Serilog.Settings.Xml
                 ProcessEnrichers(document, settings);
                 ProcessProperties(document, settings);
                 ProcessWriteTo(document, settings);
+                ProcessMinimumLevel(document, settings);
 
                 loggerConfiguration.ReadFrom.KeyValuePairs(settings);
             }
@@ -57,6 +57,39 @@ namespace Serilog.Settings.Xml
             {
                 SelfLog.WriteLine($"Cannot load xml config '{_filePath}'. Exception: {e}");
                 throw;
+            }
+        }
+
+        private void ProcessMinimumLevel(XDocument document, List<KeyValuePair<string, string>> settings)
+        {
+            var minimumLevelElement = document.XPathSelectElement("/serilog/minimumLevel");
+            if (minimumLevelElement == null)
+                return;
+
+            var baseKey = MinimumLevelDirective;
+            // default
+            var defaultLevelAttr = minimumLevelElement.Attribute("default");
+            if (!string.IsNullOrEmpty(defaultLevelAttr?.Value)) //&& ValidLevel(defaultLevelAttr.Value))
+            {
+                settings.Add(new KeyValuePair<string, string>(baseKey, defaultLevelAttr.Value));
+            }
+
+            // overrides
+            var items = minimumLevelElement.XPathSelectElements("override");
+            foreach (var element in items)
+            {
+                if (!element.HasAttributes)
+                    continue;
+
+                var name = element.Attribute("name")?.Value;
+                if (string.IsNullOrEmpty(name))
+                    continue;
+
+                var level = element.Attribute("level")?.Value;
+                if (!string.IsNullOrEmpty(level))
+                {
+                    settings.Add(new KeyValuePair<string, string>($"{baseKey}:override:{name}", level));
+                }
             }
         }
 
@@ -69,7 +102,7 @@ namespace Serilog.Settings.Xml
                     continue;
 
                 var name = element.Attribute("name")?.Value;
-                settings.Add(new KeyValuePair<string, string>($"{UsingDirectiveFullFormPrefix}{name}", name));
+                settings.Add(new KeyValuePair<string, string>($"{UsingDirective}:{name}", name));
             }
         }
 
@@ -97,7 +130,7 @@ namespace Serilog.Settings.Xml
                 var name = element.Attribute("name")?.Value;
                 if (string.IsNullOrEmpty(name))
                     continue;
-                
+
                 var value = element.Attribute("value")?.Value;
                 if (value != null)
                     value = Environment.ExpandEnvironmentVariables(value);
@@ -105,7 +138,7 @@ namespace Serilog.Settings.Xml
                 settings.Add(new KeyValuePair<string, string>($"{EnrichWithPropertyDirectivePrefix}{name}", value));
             }
         }
-        
+
         private static void ProcessWriteTo(XDocument document, List<KeyValuePair<string, string>> settings)
         {
             var items = document.XPathSelectElements("/serilog/writeTo/sink");
@@ -120,10 +153,10 @@ namespace Serilog.Settings.Xml
 
                 var parameters = element.XPathSelectElements("arg");
 
-                var baseKey = $"write-to:{name}";
+                var baseKey = $"{WriteToDirective}:{name}";
                 if (!parameters.Any())
                     settings.Add(new KeyValuePair<string, string>(baseKey, string.Empty));
-                
+
                 foreach (var parameter in parameters)
                 {
                     var paramName = parameter.Attribute("name")?.Value;
@@ -131,7 +164,7 @@ namespace Serilog.Settings.Xml
                         continue;
                     var paramValue = parameter.Attribute("value")?.Value;
                     paramValue = Environment.ExpandEnvironmentVariables(paramValue);
-                    
+
                     settings.Add(new KeyValuePair<string, string>($"{baseKey}.{paramName}", paramValue));
                 }
             }

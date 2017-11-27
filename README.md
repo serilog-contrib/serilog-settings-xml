@@ -9,8 +9,9 @@ Roadmap:
 - [x] properties
 - [x] enrich
 - [x] writeTo
-- [ ] minimumLevel 
+- [x] minimumLevel 
 - [ ] auditTo
+- [ ] xsd schema
 
 
 ### Getting started
@@ -26,7 +27,7 @@ To read configuration from xml configuration file use the `ReadFrom.Xml(filePath
 ```csharp
 Log.Logger = new LoggerConfiguration()
   .ReadFrom.Xml("serilog.config")
-  ... // Other configuration here, then
+  ... // Other configuration here
   .CreateLogger()
 ```
 
