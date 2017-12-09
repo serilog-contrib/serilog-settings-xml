@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+
+<serilog>
+
+    <using>
+        <add name="Serilog.Sinks.File" />
+    </using>
+
+    <auditTo>
+        <sink name="File">
+            <arg name="path" value="%TEMP%/invalidpath..*.log" />
+        </sink>
+    </auditTo>
+
+</serilog>

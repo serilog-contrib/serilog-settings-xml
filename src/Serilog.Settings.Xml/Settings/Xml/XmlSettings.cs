@@ -17,8 +17,6 @@ namespace Serilog.Settings.Xml
         private const string MinimumLevelDirective = "minimum-level";
         private const string EnrichWithDirective = "enrich";
         private const string EnrichWithPropertyDirective = "enrich:with-property";
-        private const string EnrichWithEventEnricherPrefix = "enrich:";
-        private const string EnrichWithPropertyDirectivePrefix = "enrich:with-property:";
 
         private readonly string _filePath;
 
@@ -49,6 +47,7 @@ namespace Serilog.Settings.Xml
                 ProcessEnrichers(document, settings);
                 ProcessProperties(document, settings);
                 ProcessWriteTo(document, settings);
+                ProcessAuditTo(document, settings);
                 ProcessMinimumLevel(document, settings);
 
                 loggerConfiguration.ReadFrom.KeyValuePairs(settings);
@@ -115,7 +114,7 @@ namespace Serilog.Settings.Xml
                     continue;
 
                 var name = element.Attribute("name")?.Value;
-                settings.Add(new KeyValuePair<string, string>($"{EnrichWithEventEnricherPrefix}{name}", ""));
+                settings.Add(new KeyValuePair<string, string>($"{EnrichWithDirective}:{name}", ""));
             }
         }
 
@@ -135,13 +134,23 @@ namespace Serilog.Settings.Xml
                 if (value != null)
                     value = Environment.ExpandEnvironmentVariables(value);
 
-                settings.Add(new KeyValuePair<string, string>($"{EnrichWithPropertyDirectivePrefix}{name}", value));
+                settings.Add(new KeyValuePair<string, string>($"{EnrichWithPropertyDirective}:{name}", value));
             }
         }
 
         private static void ProcessWriteTo(XDocument document, List<KeyValuePair<string, string>> settings)
         {
-            var items = document.XPathSelectElements("/serilog/writeTo/sink");
+            ProcessSinks(document, settings, "/serilog/writeTo/sink", WriteToDirective);
+        }
+
+        private static void ProcessAuditTo(XDocument document, List<KeyValuePair<string, string>> settings)
+        {
+            ProcessSinks(document, settings, "/serilog/auditTo/sink", AuditToDirective);
+        }
+
+        private static void ProcessSinks(XDocument document, List<KeyValuePair<string, string>> settings, string sinksXPath, string writeToDirective)
+        {
+            var items = document.XPathSelectElements(sinksXPath);
             foreach (var element in items)
             {
                 if (!element.HasAttributes)
@@ -153,7 +162,7 @@ namespace Serilog.Settings.Xml
 
                 var parameters = element.XPathSelectElements("arg");
 
-                var baseKey = $"{WriteToDirective}:{name}";
+                var baseKey = $"{writeToDirective}:{name}";
                 if (!parameters.Any())
                     settings.Add(new KeyValuePair<string, string>(baseKey, string.Empty));
 

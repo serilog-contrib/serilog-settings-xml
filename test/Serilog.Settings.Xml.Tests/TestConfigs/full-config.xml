@@ -18,10 +18,10 @@
         <enricher name="WithEnvironmentUserName" />
     </enrich>
 
-    <properties>
-        <property name="Application" value="Sample" />
-        <property name="Path" value="%PATH%" />
-    </properties>
+        <properties>
+            <property name="Application" value="Sample" />
+            <property name="Path" value="%PATH%" />
+        </properties>
 
     <minimumLevel default="Debug">
         <override name="Serilog.Settings.Xml" level="Warning" />
@@ -30,11 +30,17 @@
     <writeTo>
         <sink name="LiterateConsole" />
         <sink name="RollingFile">
-            <arg name="pathFormat" value="%TEMP%\Logs\serilog-configuration-{Date}.txt" />
+            <arg name="pathFormat" value="%TEMP%\SerilogLogs\serilog-configuration-{Date}.txt" />
         </sink>
         <sink name="File">
-            <arg name="path" value="serilog-configuration.txt" />
+            <arg name="path" value="%TEMP%\SerilogLogs\serilog-configuration.txt" />
         </sink>
     </writeTo>
+    
+    <auditTo>
+        <sink name="File">
+            <arg name="path" value="%TEMP%\SerilogLogs\serilog-audit.txt" />
+        </sink>
+    </auditTo>    
 
 </serilog>

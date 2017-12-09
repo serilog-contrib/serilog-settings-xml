@@ -2,15 +2,14 @@
 
 An XML config reader for [Serilog](https://serilog.net).
 
-### Project is in active development stage
-
 Roadmap:
 - [x] using
 - [x] properties
 - [x] enrich
 - [x] writeTo
 - [x] minimumLevel 
-- [ ] auditTo
+- [x] auditTo
+- [ ] filtes
 - [ ] xsd schema
 
 

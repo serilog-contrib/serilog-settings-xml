@@ -120,9 +120,21 @@ namespace Serilog.Settings.Xml.Tests.Settings
             Assert.NotNull(lastEvent);
         }
 
+        [Fact]
+        public void AuditToMustFailIfSinkFails()
+        {
+            var auditToLogger = new LoggerConfiguration()
+                .ReadFrom.Xml(GetTestConfigPath("audit-to-invalid-config.xml"))
+                .WriteTo.Sink(new DelegatingSink(e => lastEvent = e))
+                .CreateLogger();
+
+            Assert.Throws<IOException>(() => auditToLogger.Warning("Verbose Message"));
+        }
+
         public void Dispose()
         {
             Log.CloseAndFlush();
+            logger.Dispose();
         }
 
         private static string GetTestConfigPath(string configFileName)
