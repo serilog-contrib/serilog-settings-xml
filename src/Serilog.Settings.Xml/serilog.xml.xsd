@@ -1,9 +1,25 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+<xs:schema 
+    attributeFormDefault="unqualified" 
+    elementFormDefault="qualified" 
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    id="SerilogConfig">
+
+    <xs:simpleType name="loggingLevel">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="Verbose" />
+            <xs:enumeration value="Debug" />
+            <xs:enumeration value="Information" />
+            <xs:enumeration value="Warning" />
+            <xs:enumeration value="Error" />
+            <xs:enumeration value="Fatal" />
+        </xs:restriction>
+    </xs:simpleType>
+
     <xs:element name="serilog">
         <xs:complexType>
             <xs:sequence>
-                <xs:element name="using">
+                <xs:element name="using" minOccurs="0" maxOccurs="1">
                     <xs:complexType>
                         <xs:sequence>
                             <xs:element maxOccurs="unbounded" name="add">
@@ -14,7 +30,7 @@
                         </xs:sequence>
                     </xs:complexType>
                 </xs:element>
-                <xs:element name="enrich">
+                <xs:element name="enrich" minOccurs="0" maxOccurs="1">
                     <xs:complexType>
                         <xs:sequence>
                             <xs:element maxOccurs="unbounded" name="enricher">
@@ -25,7 +41,7 @@
                         </xs:sequence>
                     </xs:complexType>
                 </xs:element>
-                <xs:element name="properties">
+                <xs:element name="properties" minOccurs="0" maxOccurs="1">
                     <xs:complexType>
                         <xs:sequence>
                             <xs:element maxOccurs="unbounded" name="property">
@@ -37,10 +53,10 @@
                         </xs:sequence>
                     </xs:complexType>
                 </xs:element>
-                <xs:element name="minimumLevel">
+                <xs:element name="minimumLevel" minOccurs="0" maxOccurs="1">
                     <xs:complexType>
                         <xs:sequence>
-                            <xs:element name="override">
+                            <xs:element name="override" minOccurs="0" maxOccurs="unbounded">
                                 <xs:complexType>
                                     <xs:attribute name="name" type="xs:string" use="required" />
                                     <xs:attribute name="level" type="loggingLevel" use="required" />
@@ -50,12 +66,12 @@
                         <xs:attribute name="default" use="required" type="loggingLevel" />
                     </xs:complexType>
                 </xs:element>
-                <xs:element name="writeTo">
+                <xs:element name="writeTo" minOccurs="0" maxOccurs="1">
                     <xs:complexType>
                         <xs:sequence>
-                            <xs:element maxOccurs="unbounded" name="sink">
+                            <xs:element minOccurs="0" maxOccurs="unbounded" name="sink">
                                 <xs:complexType>
-                                    <xs:sequence minOccurs="0">
+                                    <xs:sequence minOccurs="0" maxOccurs="unbounded">
                                         <xs:element name="arg">
                                             <xs:complexType>
                                                 <xs:attribute name="name" type="xs:string" use="required" />
@@ -69,13 +85,13 @@
                         </xs:sequence>
                     </xs:complexType>
                 </xs:element>
-                <xs:element name="auditTo">
+                <xs:element name="auditTo" minOccurs="0" maxOccurs="1">
                     <xs:complexType>
                         <xs:sequence>
                             <xs:element name="sink">
                                 <xs:complexType>
                                     <xs:sequence>
-                                        <xs:element name="arg">
+                                        <xs:element name="arg" minOccurs="0" maxOccurs="unbounded">
                                             <xs:complexType>
                                                 <xs:attribute name="name" type="xs:string" use="required" />
                                                 <xs:attribute name="value" type="xs:string" use="required" />
@@ -91,15 +107,4 @@
             </xs:sequence>
         </xs:complexType>
     </xs:element>
-
-    <xs:simpleType name="loggingLevel">
-        <xs:restriction base="xs:string">
-            <xs:enumeration value="Verbose" />
-            <xs:enumeration value="Debug" />
-            <xs:enumeration value="Information" />
-            <xs:enumeration value="Warning" />
-            <xs:enumeration value="Error" />
-            <xs:enumeration value="Fatal" />
-        </xs:restriction>
-    </xs:simpleType>
 </xs:schema>
