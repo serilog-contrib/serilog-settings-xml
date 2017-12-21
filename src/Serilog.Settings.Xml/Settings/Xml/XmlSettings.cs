@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Xml.Linq;
-using System.Xml.XPath;
 using Serilog.Configuration;
 using Serilog.Debugging;
 
@@ -35,6 +34,7 @@ namespace Serilog.Settings.Xml
             if (!File.Exists(_filePath))
             {
                 SelfLog.WriteLine("The specified configuration file `{0}` does not exist and will be ignored.", _filePath);
+                //Q: should be we fail here?
                 return;
             }
 
@@ -42,26 +42,27 @@ namespace Serilog.Settings.Xml
             try
             {
                 var document = XDocument.Load(_filePath);
-
-                ProcessUsings(document, settings);
-                ProcessEnrichers(document, settings);
-                ProcessProperties(document, settings);
-                ProcessWriteTo(document, settings);
-                ProcessAuditTo(document, settings);
-                ProcessMinimumLevel(document, settings);
+                var root = document.Root;
+                
+                ProcessUsings(root.Element("using"), settings);
+                ProcessEnrichers(root.Element("enrich"), settings);
+                ProcessProperties(root.Element("properties"), settings);
+                ProcessWriteTo(root.Element("writeTo"), settings);
+                ProcessAuditTo(root.Element("auditTo"), settings);
+                ProcessMinimumLevel(root.Element("minimumLevel"), settings);
 
                 loggerConfiguration.ReadFrom.KeyValuePairs(settings);
             }
             catch (Exception e)
             {
                 SelfLog.WriteLine($"Cannot load xml config '{_filePath}'. Exception: {e}");
+                //Q: should we fail here?
                 throw;
             }
         }
 
-        private void ProcessMinimumLevel(XDocument document, List<KeyValuePair<string, string>> settings)
+        private void ProcessMinimumLevel(XElement minimumLevelElement, List<KeyValuePair<string, string>> settings)
         {
-            var minimumLevelElement = document.XPathSelectElement("/serilog/minimumLevel");
             if (minimumLevelElement == null)
                 return;
 
@@ -74,17 +75,17 @@ namespace Serilog.Settings.Xml
             }
 
             // overrides
-            var items = minimumLevelElement.XPathSelectElements("override");
-            foreach (var element in items)
+            var items = minimumLevelElement.Elements("override");
+            foreach (var item in items)
             {
-                if (!element.HasAttributes)
+                if (!item.HasAttributes)
                     continue;
 
-                var name = element.Attribute("name")?.Value;
+                var name = item.Attribute("name")?.Value;
                 if (string.IsNullOrEmpty(name))
                     continue;
 
-                var level = element.Attribute("level")?.Value;
+                var level = item.Attribute("level")?.Value;
                 if (!string.IsNullOrEmpty(level))
                 {
                     settings.Add(new KeyValuePair<string, string>($"{baseKey}:override:{name}", level));
@@ -92,9 +93,12 @@ namespace Serilog.Settings.Xml
             }
         }
 
-        private static void ProcessUsings(XDocument document, List<KeyValuePair<string, string>> settings)
+        private static void ProcessUsings(XElement usingElement, List<KeyValuePair<string, string>> settings)
         {
-            var items = document.XPathSelectElements("/serilog/using/add");
+            if (usingElement == null)
+                return;
+
+            var items = usingElement.Elements("add");
             foreach (var element in items)
             {
                 if (!element.HasAttributes)
@@ -105,9 +109,12 @@ namespace Serilog.Settings.Xml
             }
         }
 
-        private static void ProcessEnrichers(XDocument document, List<KeyValuePair<string, string>> settings)
+        private static void ProcessEnrichers(XElement enrichElement, List<KeyValuePair<string, string>> settings)
         {
-            var items = document.XPathSelectElements("/serilog/enrich/enricher");
+            if (enrichElement == null)
+                return;
+            
+            var items = enrichElement.Elements("enricher");
             foreach (var element in items)
             {
                 if (!element.HasAttributes)
@@ -118,9 +125,12 @@ namespace Serilog.Settings.Xml
             }
         }
 
-        private static void ProcessProperties(XDocument document, List<KeyValuePair<string, string>> settings)
+        private static void ProcessProperties(XElement propertiesElement, List<KeyValuePair<string, string>> settings)
         {
-            var items = document.XPathSelectElements("/serilog/properties/property");
+            if (propertiesElement == null)
+                return;
+
+            var items = propertiesElement.Elements("property");
             foreach (var element in items)
             {
                 if (!element.HasAttributes)
@@ -138,29 +148,32 @@ namespace Serilog.Settings.Xml
             }
         }
 
-        private static void ProcessWriteTo(XDocument document, List<KeyValuePair<string, string>> settings)
+        private static void ProcessWriteTo(XElement writeToElement, List<KeyValuePair<string, string>> settings)
         {
-            ProcessSinks(document, settings, "/serilog/writeTo/sink", WriteToDirective);
+            ProcessSinks(writeToElement, settings, WriteToDirective);
         }
 
-        private static void ProcessAuditTo(XDocument document, List<KeyValuePair<string, string>> settings)
+        private static void ProcessAuditTo(XElement auditToElement, List<KeyValuePair<string, string>> settings)
         {
-            ProcessSinks(document, settings, "/serilog/auditTo/sink", AuditToDirective);
+            ProcessSinks(auditToElement, settings, AuditToDirective);
         }
 
-        private static void ProcessSinks(XDocument document, List<KeyValuePair<string, string>> settings, string sinksXPath, string writeToDirective)
+        private static void ProcessSinks(XElement element, List<KeyValuePair<string, string>> settings, string writeToDirective)
         {
-            var items = document.XPathSelectElements(sinksXPath);
-            foreach (var element in items)
+            if (element == null)
+                return;
+
+            var items = element.Elements("sink");
+            foreach (var item in items)
             {
-                if (!element.HasAttributes)
+                if (!item.HasAttributes)
                     continue;
 
-                var name = element.Attribute("name")?.Value;
+                var name = item.Attribute("name")?.Value;
                 if (string.IsNullOrEmpty(name))
                     continue;
 
-                var parameters = element.XPathSelectElements("arg");
+                var parameters = item.Elements("arg");
 
                 var baseKey = $"{writeToDirective}:{name}";
                 if (!parameters.Any())

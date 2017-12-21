@@ -123,12 +123,16 @@ namespace Serilog.Settings.Xml.Tests.Settings
         [Fact]
         public void AuditToMustFailIfSinkFails()
         {
-            var auditToLogger = new LoggerConfiguration()
-                .ReadFrom.Xml(GetTestConfigPath("audit-to-invalid-config.xml"))
-                .WriteTo.Sink(new DelegatingSink(e => lastEvent = e))
-                .CreateLogger();
+            var path = Path.Combine(Path.GetTempPath(), "SerilogLogs", "serilog-audit.txt");
+            using (File.OpenWrite(path))
+            {
+                var auditToLogger = new LoggerConfiguration()
+                    .ReadFrom.Xml(GetTestConfigPath("audit-to-invalid-config.xml"))
+                    .WriteTo.Sink(new DelegatingSink(e => lastEvent = e))
+                    .CreateLogger();
 
-            Assert.Throws<IOException>(() => auditToLogger.Warning("Verbose Message"));
+                Assert.Throws<IOException>(() => auditToLogger.Warning("Verbose Message"));
+            }
         }
 
         public void Dispose()

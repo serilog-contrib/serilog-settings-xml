@@ -1,6 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net452</TargetFramework>
+    <!--<TargetFrameworks>net452;net46;netstandard1.3</TargetFrameworks>-->
     <PreserveCompilationContext>true</PreserveCompilationContext>
     <AssemblyName>Serilog.Settings.Xml.Tests</AssemblyName>
     <AssemblyOriginatorKeyFile>../../assets/Serilog.snk</AssemblyOriginatorKeyFile>
@@ -10,10 +11,19 @@
     <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
   </PropertyGroup>
   <ItemGroup>
-    <None Update="TestConfigs\audit-to-config.xml">
+    <None Remove="TestConfigs\audit-to-invalid-config.xml" />
+    <None Remove="TestConfigs\full-config.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="TestConfigs\audit-to-invalid-config.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="TestConfigs\full-config.xml">
+    </Content>
+    <Content Include="TestConfigs\full-config.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="TestConfigs\audit-to-config.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
@@ -32,9 +42,7 @@
     <PackageReference Include="Serilog.Enrichers.Environment" Version="2.0.0-*" />
     <PackageReference Include="Serilog.Enrichers.Process" Version="2.0.0-*" />
     <PackageReference Include="Serilog.Enrichers.Thread" Version="2.0.0" />
-    <Reference Include="System.Configuration" />
     <Reference Include="System" />
-    <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\Serilog.Settings.Xml\Serilog.Settings.Xml.csproj" />

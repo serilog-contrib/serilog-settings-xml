@@ -2,17 +2,6 @@
 
 An XML config reader for [Serilog](https://serilog.net).
 
-Roadmap:
-- [x] using
-- [x] properties
-- [x] enrich
-- [x] writeTo
-- [x] minimumLevel 
-- [x] auditTo
-- [ ] filtes
-- [ ] xsd schema
-
-
 ### Getting started
 
 The package needs to be installed from NuGet:

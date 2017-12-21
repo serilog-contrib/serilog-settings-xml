@@ -8,7 +8,7 @@
 
     <auditTo>
         <sink name="File">
-            <arg name="path" value="%TEMP%/invalidpath..*.log" />
+            <arg name="path" value="%TEMP%/SerilogLogs/serilog-audit.txt" />
         </sink>
     </auditTo>
 
