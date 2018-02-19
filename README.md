@@ -2,6 +2,14 @@
 
 An XML config reader for [Serilog](https://serilog.net).
 
+### Motivation
+
+XML based configuration can be more suitable for some projects, because:
+
+- xml transformations can be used
+- out of the box support in MS Deploy and Octopus Deploy
+- configuration consistency in leagacy (not .NET Core) projects 
+
 ### Getting started
 
 The package needs to be installed from NuGet:
