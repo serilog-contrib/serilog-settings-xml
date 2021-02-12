@@ -40,6 +40,7 @@ You can mix and match XML and code-based configuration, but each sink must be co
         <add name="Serilog.Enrichers.Thread" />
         <add name="Serilog.Enrichers.Process" />
         <add name="Serilog.Enrichers.Environment" />
+        <add name="Serilog.Sinks.File" />
     </using>
 
     <enrich>
@@ -61,7 +62,6 @@ You can mix and match XML and code-based configuration, but each sink must be co
     </minimumLevel>
 
     <writeTo>
-        <sink name="LiterateConsole" />
         <sink name="File">
             <arg name="path" value="%TEMP%/Logs/serilog-configuration-sample.txt" />
         </sink>
